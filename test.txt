@@ -1,0 +1,54 @@
+import csv
+from read_csv import read_csv_reader_list_emp_rec
+
+
+def filter_data(data, choice, filter_value):
+    header = data[0]
+    city_index = header.index('city')
+    dept_index = header.index('department')
+
+    for value in filter_value:
+        name_matched = []
+
+        for row in data[1:]:
+            if (choice == "city" and row[city_index].lower() == value.lower()) or \
+               (choice == "department" and row[dept_index].lower() == value.lower()):
+                name_matched.append(row)
+
+        if not name_matched:
+            print("{} '{}' not found in data.".format(choice.title(), value))
+        else:
+            filename = "files\\{}_employees.csv".format(value)
+            with open(filename, "w", newline='') as fp:
+                writer = csv.writer(fp)
+                writer.writerow(header)
+                writer.writerows(name_matched)
+
+            print("-" * 40)
+            print(" Created file: {} ({} records)".format(filename, len(name_matched)))
+            print("-" * 40)
+
+def main():
+    data = read_csv_reader_list_emp_rec.read_file()
+
+    while True:
+        print("===== Employee Data Filter Menu =====")
+        print("1. Filter by City")
+        print("2. Filter by Department")
+        print("3. Exit")
+
+        choice = input("Enter your choice (1/2/3): ").strip()
+        if choice == "1":
+            cities = input("Enter city names (comma separated): ").split(",")
+            filter_data(data, "city", [c.strip() for c in cities])
+        elif choice == "2":
+            depts = input("Enter department names (comma separated): ").split(",")
+            filter_data(data, "department", [d.strip() for d in depts])
+        elif choice == "3":
+            print("Exit the program!!!!")
+            break
+        else:
+            print("Invalid choice! Please enter 1, 2, or 3.")
+
+if __name__ == '__main__':
+    main()
